@@ -1,0 +1,32 @@
+name: WeeklyLearn
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+  schedule:
+    - cron: '30 2 * * 2'
+    # 现在UTC时间是2:30，北京时间是10:30，每个星期二执行
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout actions
+      uses: actions/checkout@v2
+
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+
+    - name: Install dependencies
+      run: pip install requests
+
+    - name: Run
+      run: |
+        python DxxLearn.py
+      env: 
+        cookies: ${{secrets.COOKIE}}
