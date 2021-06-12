@@ -1,7 +1,7 @@
 import requests
 import json
 import os
-import time
+# import time
 
 Cookie = os.environ["cookies"]
 
@@ -28,6 +28,7 @@ def GetMyLearned():
     url = "https://m.bjyouth.net/dxx/my-integral"
     return json.loads(requests.get(url, headers=headers).text)
 
+'''
 def CheckCourse():
     res = GetIndex()
     title_new = res["newCourse"]["title"]
@@ -40,13 +41,14 @@ def CheckCourse():
         raise ValueError("NOT Learned")
     else:
         print(f"最新的 {title_latest} 已完成")
+'''
 
 def main():
     print(GetIndex())
-    print(GetMyLearned())
     AchieveDXX()
-    time.sleep(10)
-    CheckCourse()
+    # time.sleep(10)
+    # print(GetMyLearned())
+    # CheckCourse()
 
 if __name__ == '__main__':
     main()
