@@ -43,7 +43,7 @@ def CheckCourse():
 
 def main():
     print(GetIndex())
-    print(GetMyInfo())
+    print(GetMyLearned())
     AchieveDXX()
     time.sleep(10)
     CheckCourse()
