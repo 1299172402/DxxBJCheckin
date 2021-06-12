@@ -1,7 +1,7 @@
 import requests
 import json
 import os
-# import time
+import time
 
 Cookie = os.environ["cookies"]
 
@@ -36,13 +36,17 @@ def CheckCourse():
     title_latest = res["data"][0]["title"]
 
     if title_latest!=title_new:
+        print(f"未学习最新一期")
         raise ValueError("NOT Learned")
+    else:
+        print(f"最新的 {title_latest} 已完成")
 
 def main():
     print(GetIndex())
+    print(GetMyInfo())
     AchieveDXX()
-    # time.sleep(10)
-    # CheckCourse()
+    time.sleep(10)
+    CheckCourse()
 
 if __name__ == '__main__':
     main()
