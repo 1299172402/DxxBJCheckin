@@ -1,22 +1,55 @@
-import requests
-import json
+import re
 import os
 
-Cookie = os.environ["cookies"]
+from playwright.sync_api import sync_playwright
 
-headers = {
-    "Host": "m.bjyouth.net",
-    "User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36 NetType/WIFI MicroMessenger/7.0.20.1781(0x6700143B) WindowsWechat(0x6303004c)",
-    "Cookie": Cookie,
-    "Referer": "https://m.bjyouth.net/qndxx/index.html"
-}
+import ocr
 
-def GetIndex():
-    url = "https://m.bjyouth.net/dxx/index"
-    return json.loads(requests.get(url, headers=headers).text)
+USERNAME = os.environ['USERNAME']
+PASSWORD = os.environ['PASSWORD']
+
+Orgid = ''
+cookies = ''
+
+def run(playwright):
+    chromium = playwright.chromium
+    browser = chromium.launch()
+    context = browser.new_context()
+    page = context.new_page()
+
+    while True:
+        LoginURL = 'https://m.bjyouth.net/site/login'
+        page.goto(LoginURL)
+        page.locator('//*[@id="username"]').fill(USERNAME)
+        page.locator('//*[@id="password"]').fill(PASSWORD)
+        page.locator('//*[@id="verifyCode-image"]').screenshot(path='verifyCode.png')
+        verifyCode = ocr.main('verifyCode.png')
+        page.locator('//*[@id="verifyCode"]').fill(verifyCode)
+        page.locator('//*[@id="loginform"]/ul/li[4]/button').click()
+        page.wait_for_timeout(1000)
+        if page.url != 'https://m.bjyouth.net/site/login':
+            break
+    
+    global Orgid
+    MyOrgURL = 'https://m.bjyouth.net/mine/my-org'
+    page.goto(MyOrgURL)
+    OrgName = page.locator('//*[@id="item1"]/div/div/div[1]/ul/li/div/div[1]').text_content()
+    Orgid = re.search(r'\(\d+\)', OrgName).group()
+    Orgid = Orgid[1:-1]
+
+    global cookies
+    cookies = context.cookies()
+    for item in cookies:
+        if item['name'] == 'PHPSESSID':
+            cookies = f'PHPSESSID={item["value"]}'
+
+    context.close()
+    browser.close()
 
 def main():
-    print(GetIndex())
+    with sync_playwright() as playwright:
+        run(playwright)
+    return Orgid, cookies
 
 if __name__ == '__main__':
     main()

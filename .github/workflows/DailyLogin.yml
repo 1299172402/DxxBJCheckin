@@ -1,8 +1,6 @@
 name: DailyLogin
 
 on:
-  push:
-    branches: [ main ]
   workflow_dispatch:
   schedule:
     - cron: '30 2 * * *'
@@ -14,16 +12,17 @@ jobs:
     - name: Checkout actions
       uses: actions/checkout@v2
 
-    - name: Set up Python 3.9.2
+    - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: 3.9.2
+        python-version: 3.10.2
 
     - name: Install dependencies
-      run: pip install requests
+      run: pip install -r requirements.txt
 
     - name: Run
       run: |
         python DxxLogin.py
       env: 
-        cookies: ${{secrets.COOKIE}}
+        USERNAME: ${{ secrets.USERNAME }}
+        PASSWORD: ${{ secrets.PASSWORD }}
